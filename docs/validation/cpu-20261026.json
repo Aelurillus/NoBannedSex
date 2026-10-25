@@ -1,0 +1,99 @@
+{
+  "date_local": "2026-10-26",
+  "timezone": "Asia/Shanghai",
+  "environment": {
+    "python": "3.12.14",
+    "torch": "2.6.0+cpu",
+    "numpy": "2.3.5",
+    "device": "cpu"
+  },
+  "unit_and_integration_tests": {
+    "tests": 65,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "baseline_original_archive_tests": 6,
+  "acceptance": {
+    "raw_training_final_step": 12,
+    "mmap_training_final_step": 12,
+    "generate": "passed",
+    "safetensors_export": "passed",
+    "raw_final_validation_loss": 5.241677284240723,
+    "mmap_final_validation_loss": 5.260838985443115
+  },
+  "synthetic_short_answer_fixture": {
+    "count": 4,
+    "answerable_count": 3,
+    "unanswerable_count": 1,
+    "answerable_exact_match": 0.0,
+    "answerable_answer_coverage": 1.0,
+    "answerable_wrong_answer_rate": 1.0,
+    "answerable_excessive_abstention_rate": 0.0,
+    "unanswerable_abstention_rate": 0.0,
+    "answerable_empty_response_rate": 0.0,
+    "unanswerable_empty_response_rate": 0.0
+  },
+  "heldout_lm_fixture": {
+    "tokens": 275,
+    "loss": 5.288005482066762,
+    "perplexity": 197.94822014347122,
+    "next_token_accuracy": 0.0036363636363636364,
+    "data_sha256": "97ae6f44abcf0f8e107a8b7ac644c2f700672e6b25468cf8e03ce309bd746516"
+  },
+  "cpu_benchmark": {
+    "kind": "synthetic-training-step-only",
+    "config_sha256": "b194f1a7dcfa91e11097dc8b6f47f32977068045e376620ff32559f8bb433907",
+    "model_config": {
+      "vocab_size": 260,
+      "dim": 64,
+      "n_layers": 2,
+      "n_heads": 4,
+      "n_kv_heads": 2,
+      "hidden_dim": 176,
+      "max_seq_len": 64,
+      "rope_theta": 10000.0,
+      "dropout": 0.0,
+      "gradient_checkpointing": false
+    },
+    "train_config": {
+      "steps": 12,
+      "batch_size": 4,
+      "grad_accum": 1,
+      "learning_rate": 0.0005,
+      "min_lr_ratio": 0.1,
+      "warmup_steps": 2,
+      "weight_decay": 0.1,
+      "grad_clip": 1.0,
+      "seed": 42,
+      "eval_every": 4,
+      "save_every": 4,
+      "eval_batches": 2,
+      "val_fraction": 0.15,
+      "precision": "auto",
+      "num_threads": 4
+    },
+    "device": "cpu",
+    "precision": "fp32",
+    "torch_version": "2.6.0+cpu",
+    "python": "3.12.14",
+    "git": {
+      "commit": "d940cc1b25541b0496fb1d87e85105f859af2fa1",
+      "dirty": true
+    },
+    "parameters": 109120,
+    "measured_steps": 3,
+    "warmup_steps": 1,
+    "seconds_per_step": 0.009381476666665852,
+    "tokens_per_second": 27287.81503125367,
+    "peak_allocated_bytes": null,
+    "gpu_name": null,
+    "limitations": "Synthetic data, no model quality measurement, no provisioning, no cloud cost estimate."
+  },
+  "paid_gpu_launched": false,
+  "limitations": [
+    "Synthetic fixtures only, no useful model ability demonstrated.",
+    "Benchmark is CPU synthetic throughput only and excludes data transfer.",
+    "No CUDA, GPU recovery, Docker, distributed, effective long-context or quantization validation."
+  ]
+}

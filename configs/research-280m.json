@@ -1,0 +1,29 @@
+{
+  "model": {
+    "vocab_size": 32000,
+    "dim": 1024,
+    "n_layers": 22,
+    "n_heads": 16,
+    "n_kv_heads": 4,
+    "hidden_dim": 2816,
+    "max_seq_len": 2048,
+    "rope_theta": 10000.0,
+    "dropout": 0.0,
+    "gradient_checkpointing": true
+  },
+  "train": {
+    "steps": 20000,
+    "batch_size": 2,
+    "grad_accum": 16,
+    "learning_rate": 0.0003,
+    "min_lr_ratio": 0.1,
+    "warmup_steps": 500,
+    "weight_decay": 0.1,
+    "grad_clip": 1.0,
+    "seed": 42,
+    "eval_every": 200,
+    "save_every": 200,
+    "eval_batches": 5,
+    "val_fraction": 0.02
+  }
+}

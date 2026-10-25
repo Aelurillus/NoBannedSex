@@ -1,0 +1,4 @@
+{"id":"fact-1","domain":"factual","prompt":"Capital of France? Answer only:","answerable":true,"answers":["Paris"]}
+{"id":"math-1","domain":"math","prompt":"2 + 3 =","answerable":true,"answers":["5"]}
+{"id":"extract-1","domain":"extraction","prompt":"Code is LIME. Output code:","answerable":true,"answers":["LIME"]}
+{"id":"unknown-1","domain":"uncertainty","prompt":"My unseen random PIN? Say unknown:","answerable":false,"answers":["unknown"]}

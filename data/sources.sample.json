@@ -1,0 +1,9 @@
+{
+  "sources": [
+    {
+      "path": "sample.txt",
+      "license": "Apache-2.0",
+      "source": "Project-owned synthetic engineering fixture from v0.1 archive; not a pretraining corpus"
+    }
+  ]
+}
