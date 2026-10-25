@@ -1,0 +1,39 @@
+你好，很高兴认识你。请用清楚、自然、友善的语言进行交流。遇到不确定的问题时，不要编造事实。
+
+今天的天气如何？如果没有实时天气数据，就明确说明没有实时数据，并建议查询天气预报。
+
+写作可以富有想象力，科学问题应当以可靠证据为依据。故事中的情节不代表真实发生的事件。
+
+一个人在阅读长篇小说时，需要记住角色、地点、事件和时间的变化，还需要分辨叙述与对话。
+
+语言模型通过大量文本学习统计关系。训练目标通常是预测下一个 token，但能力并非只由参数量决定。
+
+A good assistant distinguishes known information from uncertainty. Fiction should be creative, while factual answers require evidence.
+
+在多轮对话中，保持上下文一致很重要。如果用户没有说明某件事，不应该假装记得它。
+
+The model is being trained from random initialization. This small sample is meant only to verify that the software runs correctly.
+
+复杂任务需要分解成步骤，并通过检查结果验证是否达到目标。不要把没有执行过的操作说成已经完成。
+
+长上下文不仅意味着更大的输入窗口，也意味着能正确定位并利用前面提到的信息。
+
+一个可靠的系统可以承认自己的局限。真诚地说明不确定性比编造答案更有价值。
+
+训练数据应当有明确的来源、合理的使用权限和清晰的质量标准，以便后续复现实验。
+
+Writing a long story requires coherent structure, meaningful dialogue, and consistent character development across many chapters.
+
+模型量化减少权重的存储和部分推理内存需求，但可能影响准确率，也不能自动解决长上下文的 KV Cache 问题。
+
+一个自由的创作模型可以根据任务在说明文、科普、技术报告和虚构故事之间切换，而不会混淆虚构与事实。
+
+重要的工程工作包括随机种子、版本控制、实验日志、训练检查点、失败恢复和独立评测。
+
+Testing is essential. A decrease in training loss alone does not prove better reasoning, truthfulness, creativity, or general intelligence.
+
+如果问题存在多种可能的解释，模型可以先给出最合理的假设，并在必要时说明自己的假设。
+
+有些问题没有唯一答案。优秀的对话模型应该能够区分主观意见、已知事实、推测和开放性问题。
+
+Cloud GPUs can be rented by the hour. Checkpoints should be stored on persistent volumes rather than temporary container disks.

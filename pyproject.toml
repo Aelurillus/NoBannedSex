@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nobannedsex-llm"
+version = "0.1.0"
+description = "Independent decoder-only language model research starter: training from random weights"
+requires-python = ">=3.10"
+dependencies = ["torch>=2.2"]
+
+[project.optional-dependencies]
+tokenizer = ["tokenizers>=0.20"]
+export = ["safetensors>=0.4"]
+dev = ["pytest>=8", "tokenizers>=0.20", "safetensors>=0.4"]
+
+[tool.setuptools.packages.find]
+include = ["nobannedsex*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
