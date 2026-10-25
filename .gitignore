@@ -12,3 +12,8 @@ artifacts/
 *.gguf
 *.bin
 .cache/
+*.egg-info/
+.ruff_cache/
+reports/
+prepared/
+*.sqlite

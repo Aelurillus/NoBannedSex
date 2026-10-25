@@ -6,9 +6,7 @@ import json
 from pathlib import Path
 import shutil
 
-import torch
-
-from .generate import load_model
+from .generate import load_bundle
 
 
 def main():
@@ -21,7 +19,7 @@ def main():
         from safetensors.torch import save_model
     except ImportError as exc:
         raise SystemExit('Install export dependency: pip install -e ".[export]"') from exc
-    model = load_model(args.checkpoint, "cpu")
+    model, _ = load_bundle(args.checkpoint, "cpu")
     if args.dtype == "fp16":
         model.half()
     elif args.dtype == "bf16":

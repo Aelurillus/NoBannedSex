@@ -1,12 +1,12 @@
 """Small, readable GQA/RoPE decoder-only Transformer, initialized from scratch."""
 from __future__ import annotations
 
-from dataclasses import dataclass
 import math
 
 import torch
 from torch import nn
 from torch.nn import functional as F
+from torch.utils.checkpoint import checkpoint
 
 from .config import ModelConfig
 
@@ -19,7 +19,7 @@ class RMSNorm(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         y = x.float() * torch.rsqrt(x.float().square().mean(dim=-1, keepdim=True) + self.eps)
-        return y.to(x.dtype) * self.weight
+        return y.to(x.dtype) * self.weight.to(x.dtype)
 
 
 def rotary_cache(length: int, head_dim: int, device: torch.device, theta: float) -> tuple[torch.Tensor, torch.Tensor]:
@@ -122,12 +122,16 @@ class NoBannedSexLM(nn.Module):
     def forward(self, token_ids: torch.Tensor, targets: torch.Tensor | None = None):
         if token_ids.ndim != 2:
             raise ValueError("token_ids must be rank-2 [batch, time]")
+        if token_ids.size(0) == 0 or token_ids.size(1) == 0:
+            raise ValueError("token_ids batch and time must be nonempty")
+        if targets is not None and targets.shape != token_ids.shape:
+            raise ValueError("targets shape must match token_ids")
         if token_ids.size(1) > self.cfg.max_seq_len:
             raise ValueError(f"sequence exceeds configured max_seq_len={self.cfg.max_seq_len}")
         x = self.embed(token_ids)
         for block in self.layers:
             if self.cfg.gradient_checkpointing and self.training:
-                x = torch.utils.checkpoint.checkpoint(block, x, use_reentrant=False)
+                x = checkpoint(block, x, use_reentrant=False)
             else:
                 x = block(x)
         logits = self.lm_head(self.norm(x))
@@ -144,7 +148,11 @@ class NoBannedSexLM(nn.Module):
                  top_k: int = 40, top_p: float = 1.0, eos_id: int | None = None) -> torch.Tensor:
         if ids.ndim != 2 or ids.size(0) != 1 or ids.size(1) == 0:
             raise ValueError("generation expects one nonempty [1, time] prompt")
-        if temperature < 0:
+        if type(max_new_tokens) is not int or max_new_tokens < 0:
+            raise ValueError("max_new_tokens must be a nonnegative integer")
+        if type(top_k) is not int or top_k < 0:
+            raise ValueError("top_k must be a nonnegative integer")
+        if not math.isfinite(temperature) or temperature < 0:
             raise ValueError("temperature must be >= 0")
         if not 0 < top_p <= 1:
             raise ValueError("top_p must be in (0, 1]")

@@ -1,0 +1,3 @@
+This synthetic held-out paragraph checks deterministic language-model scoring. A test fixture does not establish useful intelligence.
+
+这段合成文本仅用于验证评测程序。评测指标应当独立于训练数据，语言模型损失也不能替代事实准确率。

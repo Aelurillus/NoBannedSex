@@ -1,39 +1,68 @@
-# NoBannedSex v0.1 — Architecture and research roadmap
+# v0.1 engineering architecture
 
-## What exists now
+The model initializes all parameters randomly. Training/inference have no hosted
+model calls, downloaded pretrained weights, output blacklist or moderation module.
+Truthfulness metrics are implemented independently of output topic policy.
 
-- Real, trainable decoder-only Transformer with random weight initialization.
-- Causal scaled-dot-product attention with group-query heads (GQA), rotary positional encoding, RMSNorm, SwiGLU, and tied embedding/LM head weights.
-- Two tokenizer modes: a lossless UTF-8 byte baseline for zero-dependency CPU tests; a self-trained ByteLevel BPE production tokenizer (`tokenizers` optional dependency).
-- Single-process next-token training, document-level train/validation splitting, simple metric logging, optimizer checkpointing, exact corpus/tokenizer hash validation on resume, greedy/temperature/top-k/top-p sampling and safetensors export.
-- No external hosted model, hidden safety filter, or moderation/keyword blacklist in the architecture.
+## Decoder
 
-## Known limitations
+Pre-norm residual blocks use RMSNorm, causal scaled-dot-product attention, and
+SwiGLU feed-forward layers. Query heads are grouped over fewer key/value heads.
+RoPE uses paired halves (GPT-NeoX layout) for Q/K consistently. Embeddings and LM
+output share parameters. Residual projections use depth-scaled initialization.
+Optional non-reentrant activation checkpointing preserves dropout random state.
 
-- The sample data and small smoke model are **engineering tests**, not useful conversational intelligence, factual alignment or roleplay models.
-- `make_corpus` reads everything into RAM; it is unsuitable for large datasets.
-- GQA currently materializes duplicated KV heads for compatibility and is not optimal for long contexts.
-- Generation recomputes the context each token; no KV cache; no distributed training.
-- GQA/RoPE by themselves do not make the model reliable at 128K context. Training from scratch at 128K is prohibitively expensive for early stages.
-- No instruct fine-tuning, preference training, low-hallucination eval, roleplay tuning, 4-bit quantization kernels, or GGUF converter are implemented yet.
-- Optimizer checkpoint (.pt) is a Python pickle file; only load trusted locally created files.
+Tests compare RMSNorm, RoPE, SwiGLU and GQA against independent mathematical
+references; GQA forward values and input gradients match explicit causal
+attention for MQA/GQA/MHA shapes. Additional tests check no future-token leakage,
+ignored loss targets, tied weights and checkpointed versus ordinary gradients.
 
-## Versioned plan
+GQA explicitly repeats KV heads for backend compatibility. RoPE tables are
+recomputed, generation recomputes all context at every token, and long outputs
+slide over the configured window. There is no efficient KV cache, fused GQA
+selection, paged attention, distributed execution or effective-long-context
+claim. The configurable context limit is only a shape constraint.
 
-- v0.1: reproducible CPU smoke, repository-ready source, unit tests, cloud job skeleton (implemented; GitHub publication pending).
-- v0.2: scalable data/tokenization, streaming token shards, benchmark baseline, single-GPU stability, FSDP.
-- v0.3: meaningful pretrain experiments; ablations on hallucination/abstention vs task completion.
-- v0.4: multi-domain instruction post-training, creative/roleplay and truthfulness datasets with distinct evaluation suites.
-- v0.5: efficient long-context extension (8K -> 32K -> 128K only if compute/validation support it), retrieval tests, KV-cache optimized inference.
-- v1.0: validated quantization and release with source, reproducibility manifests, tokenizer and model cards.
+## Trainer and recovery
 
-## Deployment concept
+The single-process AdamW trainer supports gradient accumulation/clipping, cosine
+learning-rate decay, warmup, FP32 and BF16 CUDA autocast. Parameters and optimizer
+states remain FP32 under autocast. No FP16/GradScaler or distributed optimizer is
+implemented. Non-finite loss/gradients fail before the optimizer update; the last
+complete checkpoint remains available.
 
-Codex / GitHub: engineering, tests, review, orchestration.
-External cloud GPU instance(s): real training.
-Durable object storage or attached persistent volume: corpora, checkpoints, experiment artifacts.
-User-owned model files: independent inference and future training.
+Checkpoint v2 stores model, optimizer, step, the complete training recipe, global
+CPU/CUDA/Python random states and separate train/evaluation sampler generators.
+The loss-schedule horizon cannot change on resume. Use `--stop-after N` to stop at
+a completed step and `--resume` to continue the same experiment. Eval cadence does
+not alter training random draws. Atomic replacement protects the previous file
+if a new serialization fails; logs beyond a durable checkpoint are discarded
+when resuming. This is step-boundary recovery, not mid-microbatch recovery.
 
-## Scaling caveat
+The loader explicitly uses `weights_only=True` and checkpoints contain only
+tensors/primitives. It does not add arbitrary classes to the loader allowlist.
+Load your own artifacts and verify provenance. V1 artifacts support inference
+through the restricted loader; strict v2 recovery requires restarting a v1 run.
 
-`configs/research-280m.json` is a **shape candidate**, not a validated training recipe or promised performance/cost. It requires a custom BPE tokenizer of exactly 32K tokens and an authorized sufficiently large corpus. Add a distributed trainer before multiplying GPU count. Context length is currently set to 2048 to prevent accidental 128K quadratic-attention costs.
+Resume rejects changes to model, training recipe, corpus/manifest, tokenizer,
+device type, effective precision, thread count or PyTorch version. CPU bitwise
+recovery is tested in a fixed environment, including dropout and accumulation,
+for raw-file and mmap routes. Cross-hardware/CUDA determinism and abrupt machine
+failure are not validated. Persistent storage and external backups remain needed.
+
+## Data, inference and artifacts
+
+Byte tokenization preserves valid UTF-8 text; arbitrary generated byte sequences
+may decode to replacement characters. Optional ByteLevel BPE is trained locally
+and saved beside checkpoints. Inference checks its SHA-256 as well as vocabulary
+size. Export writes safetensors with shared-weight handling, a model config and
+tokenizer metadata. Tests load the exported tensors into the reference model and
+compare logits. This is not a Hugging Face AutoModel/GGUF compatibility release.
+
+See [data contracts](DATA_PIPELINE.md), [evaluation definitions](EVALUATION.md) and
+[GPU handoff](CLOUD_GPU.md). Quantization and optimized serving remain future work.
+
+Primary API references:
+- https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html
+- https://docs.pytorch.org/docs/stable/checkpoint.html
+- https://docs.pytorch.org/docs/stable/notes/serialization.html

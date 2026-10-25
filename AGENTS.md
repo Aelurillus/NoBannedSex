@@ -25,9 +25,9 @@ Make the project reproduce a correct CPU smoke test, then prepare larger runs to
 
 ## Prioritized follow-up tasks
 
-1. Add proper document-sharded streaming dataset loader with per-document train/validation split, dedup and licensing manifests. Current loader is in-memory demo only.
+1. Extend the implemented local mmap pipeline with near-duplicate detection, benchmark-contamination checks and external-storage ingestion. Keep source rights and exact document split provenance.
 2. Add fused/native GQA kernels, paged KV cache, and efficient inference. Current implementation duplicates KV heads and recomputes all context for every new token.
 3. Build distributed GPU pretraining (`torchrun`/FSDP or equivalent) and recovery-safe optimizer sharding; current script is single-process.
-4. Add independent truthfulness, multi-turn memory, roleplay, creative writing, coding and long-context evaluation datasets, with both answer and abstention metrics.
+4. Expand the implemented short-answer evaluation harness into independent truthfulness, multi-turn memory, roleplay, creative writing, coding and long-context benchmarks. Keep accuracy, coverage and abstention separate.
 5. Add supervised post-training, preference optimization, long-context extension, and a working GPTQ/AWQ/GGUF conversion workflow after confirming tool compatibility.
 6. Record measured VRAM, tokens/sec, GPU hours, total costs, and run reproducibility; report limitations openly.

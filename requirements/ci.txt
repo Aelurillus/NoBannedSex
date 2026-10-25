@@ -1,0 +1,6 @@
+# Direct dependency versions used by the CPU CI jobs (Python 3.11/3.12).
+numpy==2.3.5
+pytest==9.1.1
+tokenizers==0.23.3
+safetensors==0.8.0
+ruff==0.17.2
